@@ -59,10 +59,6 @@ class Statistics extends Component {
         });
       });
     }
-    checkStatistics(){
-      console.log(this.state);
-    }
-    
     render() {
         return (
             <>
@@ -75,11 +71,10 @@ class Statistics extends Component {
               </View>
             </View>
             <View style={{marginBottom: 80}}>
-              <Button title="See statistics" onPress={()=>this.checkStatistics()} />
               <FlatList
-                data={this.state.joined}
+                data={this.state.users}
                 renderItem={
-                  ({ item }) => <User name={item.name} paid={item.paid} paid_at={item.paid_at} attended={item.attended} attended_at={item.attended_at} />
+                  ({ item }) => <User name={item.name} paid={item.paid} id={item.id} />
                 }
                 keyExtractor={item => item.id}
               />
