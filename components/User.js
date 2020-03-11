@@ -19,7 +19,7 @@ class User extends Component {
     }
     modalOpened(){
       db.transaction(tx => {
-        tx.executeSql(`SELECT * FROM Statistics WHERE user_id = ${this.state.user_id}`, [], (tx, results) => {
+        tx.executeSql(`SELECT * FROM Statistics WHERE user_id = ${this.state.user_id} ORDER BY id DESC `, [], (tx, results) => {
           var temp = [];
           for (let i = 0; i < results.rows.length; ++i) {
             temp.push(results.rows.item(i));
@@ -38,7 +38,7 @@ class User extends Component {
               animationType="slide"
               transparent={false}
               visible={this.state.modalVisible}
-              style={{justifyContent:"space-between"}}
+              style={{justifyContent:"space-between", marginBottom: 80}}
               onShow={()=>this.modalOpened()}
             >
                 <View>

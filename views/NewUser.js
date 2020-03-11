@@ -9,11 +9,14 @@ import { formatedDate } from '../helpers/formatedDate';
 class Statistics extends Component {
     constructor(props) {
         super(props);
+        const { group_id } = this.props.route.params || 1;
         this.state = {
             avatarSource : {uri: 'https://picsum.photos/150'},
             name: "",
-            dateOfBirth: ""
+            dateOfBirth: "",
+            group_id: 1
         }
+        this.groupSelect(group_id || this.state.group_id);
     }
 
     async pickImage(){
@@ -56,8 +59,8 @@ class Statistics extends Component {
         return;
       }
       db.transaction(tx => {
-        tx.executeSql(`INSERT INTO Users (image, name, date_of_birth,paid,attended,updated_at)
-          VALUES ("${this.state.avatarSource.uri}","${this.state.name}"," ${this.state.dateOfBirth}", "0", "0", "${date}")`, [], (tx, results) => {
+        tx.executeSql(`INSERT INTO Users (image, name, date_of_birth,paid,attended,updated_at,group_id)
+          VALUES ("${this.state.avatarSource.uri}","${this.state.name}"," ${this.state.dateOfBirth}", "0", "0", "${date}", ${this.state.group_id})`, [], (tx, results) => {
                 console.log(results)
                 if(!results.rowsAffected > 0){
                   this.refs.toast.show('Something went wrong :(');
@@ -71,19 +74,34 @@ class Statistics extends Component {
             });
         });
     }
+    groupSelect(group_id){
+      this.setState({
+        group_id: group_id
+      });
+    } 
     render() {
         return (
             <>
             
-            <View style={{flexDirection:"row", marginBottom: 10}}>
+            <View style={{flexDirection:"row", marginBottom: 5}}>
               <View style={{flex:1, marginRight:2}}>
-                <Button style={{flex:1}}title="Home" onPress={() => this.props.navigation.navigate('Home')} />
+                <Button style={{flex:1}}title="Home" onPress={() => this.props.navigation.navigate('Home', {group_id: this.state.group_id})} />
               </View>
               <View style={{flex:1, marginLeft:2}}>
-                <Button style={{flex:1}}title="Statistics" onPress={()=>this.props.navigation.navigate('Statistics')} />
+                <Button style={{flex:1}}title="Statistics" onPress={()=>this.props.navigation.navigate('Statistics', {group_id: this.state.group_id})} />
               </View>
             </View>
-            
+            <View style={{flexDirection:"row", marginBottom: 10}}>
+              <View style={{flex: 1}}>
+                <Button title="Group 1" color={this.state.group_id === 1 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(1)}/>
+              </View>
+              <View style={{flex: 1,marginLeft:2, marginRight:2}}>
+                <Button title="Group 2" color={this.state.group_id === 2 || this.group_id === 2 ? "red" : "lightblue"} onPress={()=>this.groupSelect(2)}/>
+              </View>
+              <View style={{flex: 1}}>
+                <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 3 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
+              </View>
+            </View>
             <ScrollView>
                 <View style={{flexDirection:'column', alignItems: 'center',marginLeft: 10, marginRight: 10, marginBottom: 5}}>
                     <Image source={this.state.avatarSource} style={{width: 144, height: 256}}/>

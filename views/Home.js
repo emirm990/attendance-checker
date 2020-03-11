@@ -10,22 +10,28 @@ import db from '../database/database';
 class Home extends Component {
     constructor(props) {
         super(props);
+        const { group_id } = this.props.route.params || 1;
         this.state = {
             users: [],
             modalVisible: false,
             user_id: "",
+            group_id: 1,
             name: "",
             date_of_birth: "",
             avatarSource : {uri: 'https://picsum.photos/150'},
           };
-          this.getAllUsers();
+          this.state.group_id = group_id;
+          this.groupSelect(group_id || this.state.group_id);
           this.props.navigation.addListener('focus', () => {
-            this.getAllUsers();
+            this.groupSelect(this.state.group_id);
           });
+    }
+    componentDidMount(){
+      this.groupSelect(this.group_id);
     }
     getAllUsers(){
       db.transaction(tx => {
-        tx.executeSql('SELECT * FROM Users', [], (tx, results) => {
+        tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id}`, [], (tx, results) => {
           var temp = [];
           for (let i = 0; i < results.rows.length; ++i) {
             temp.push(results.rows.item(i));
@@ -137,7 +143,8 @@ class Home extends Component {
           SET image="${this.state.avatarSource.uri}",
               name="${this.state.name}", 
               date_of_birth="${this.state.date_of_birth}",
-              updated_at="${date}"
+              updated_at="${date}",
+              group_id=${this.state.group_id}
           WHERE id=${id}`,
           [], (tx, results) => {
             if(!results.rowsAffected > 0 ){
@@ -187,7 +194,16 @@ class Home extends Component {
           }},
         ]
       );
-    } 
+    }
+    groupSelect(group_id){
+      this.setState({
+        group_id: group_id
+      });
+      this.getAllUsers();
+    }
+    setButtonColor(){
+      return "red";
+    }
     viewsList() {
       if(this.state.users.length === 0){
         return (
@@ -238,11 +254,22 @@ class Home extends Component {
                     }} title="Back" />
                   </View>
                   <View style={{flex:1, marginLeft:2}}>
-                    <TouchableOpacity style={{borderColor: 'red', borderWidth: 1 }} activeOpacity={0.8} title="Delete user" onLongPress={()=>this.deleteUser(this.state.user_id)} >
+                    <TouchableOpacity style={{borderColor: 'red', borderWidth: 1 }} activeOpacity={0.8} title="Delete user" onPress={()=>this.deleteUser(this.state.user_id)} >
                       <View style={{height: 35,alignItems: 'center',justifyContent:'center'}}>
                         <Text style={{textAlign: 'center',padding: 20,color: 'red'}}>Delete user</Text>
                       </View>
                     </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={{flexDirection:"row", marginBottom: 10}}>
+                  <View style={{flex: 1}}>
+                    <Button title="Group 1" color={this.state.group_id === 1 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(1)}/>
+                  </View>
+                  <View style={{flex: 1,marginLeft:2, marginRight:2}}>
+                    <Button title="Group 2" color={this.state.group_id === 2 || this.group_id === 2 ? "red" : "lightblue"} onPress={()=>this.groupSelect(2)}/>
+                  </View>
+                  <View style={{flex: 1}}>
+                   <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 3 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
                   </View>
                 </View>
                 <ScrollView style={{marginTop: 10}}>
@@ -260,10 +287,21 @@ class Home extends Component {
               </Modal>
             <View style={{flexDirection:"row"}}>
               <View style={{flex:1, marginRight:2}}>
-                <Button style={{flex:1}}title="Statistics" onPress={() => this.props.navigation.navigate('Statistics')} />
+                <Button style={{flex:1}}title="Statistics" onPress={() => this.props.navigation.navigate('Statistics', {group_id: this.state.group_id})} />
               </View>
               <View style={{flex:1, marginLeft:2}}>
-                <Button style={{flex:1}}title="New User" onPress={()=>this.props.navigation.navigate('NewUser')} />
+                <Button style={{flex:1}}title="New User" onPress={()=>this.props.navigation.navigate('NewUser', {group_id: this.state.group_id})} />
+              </View>
+            </View>
+            <View style={{flexDirection:"row", marginTop: 5}}>
+              <View style={{flex: 1}} >
+                <Button title="Group 1" color={this.state.group_id === 1 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(1)}/>
+              </View>
+              <View style={{flex: 1,marginLeft:2, marginRight:2}}>
+                <Button title="Group 2" color={this.state.group_id === 2 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(2)}/>
+              </View>
+              <View style={{flex: 1}}>
+                <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
               </View>
             </View>
             <Swiper showsButtons={true}>
