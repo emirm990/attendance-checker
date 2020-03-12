@@ -6,7 +6,9 @@ import Swiper from 'react-native-swiper';
 import { formatedDate } from '../helpers/formatedDate';
 import { requestCameraPermission, requestExternalPermission, requestExternalReadPermission } from '../helpers/permissions';
 import db from '../database/database';
+import Database from '../database/Database2';
 
+const Db = new Database();
 class Home extends Component {
     constructor(props) {
         super(props);
@@ -28,57 +30,47 @@ class Home extends Component {
     componentDidMount(){
       this.groupSelect(this.state.group_id);
     }
-    getAllUsers(){
-      db.transaction(tx => {
-        tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id}`, [], (tx, results) => {
-          var temp = [];
-          for (let i = 0; i < results.rows.length; ++i) {
-            temp.push(results.rows.item(i));
-          }
-          this.setState({
-            users: temp
-          });
+    getAllUsers(group_id){
+      Db.getAllUsersFromDb(group_id).then(data=>{
+        this.setState({
+          users: data
         });
       });
     }
-    updatePaid(value,id){
-      let date = formatedDate();   
-      db.transaction(tx => {
-        tx.executeSql(`UPDATE Users SET paid = ${value ? 1:0} WHERE id = ${id}`, [], (tx, results) => {
-          if(results.rowsAffected > 0){
-            this.refs.toast.show('User succesfully updated!');
-          }else{
-            this.refs.toast.show('Something went wrong :(');
-          }
-          if(value === true){
-            tx.executeSql(`INSERT INTO Statistics (user_id, paid_at)
-              VALUES (${id}, "${date}")`, [], (tx, results) => {
-            this.getAllUsers();
-          });
-          }else{
-            this.getAllUsers();
-          }
-      });
-    })}
-    updateAttended(value,id){  
-      let date = formatedDate();
-      db.transaction(tx => {
-        tx.executeSql(`UPDATE Users SET attended = ${value ? 1:0}, updated_at = "${date}" WHERE id = ${id}`, [], (tx, results) => {
-          if(results.rowsAffected > 0){
-            this.refs.toast.show('User succesfully updated!');
-          }else{
-            this.refs.toast.show('Something went wrong :(');
-          }
-          if(value===true){
-            tx.executeSql(`INSERT INTO Statistics (user_id, attended_at)
-            VALUES (${id}, "${date}")`, [], (tx, results) => {
-              this.getAllUsers();
-            });
-          }else{
-            this.getAllUsers();
-          }
-        });
-      });
+    
+    updatePaid(value, id){
+      Db.updatePaid(value,id);
+      this.getAllUsers(this.state.group_id);
+    }
+
+    updateAttended(value, id){
+      Db.updateAttended(value,id);
+      this.getAllUsers(this.state.group_id);
+    }
+    
+    deleteUser(id) {
+      Alert.alert(
+        'Delete user',
+        'Delete user?',
+          [
+            {text: 'NO', onPress: () => {
+              this.setState({
+                modalOpened: false
+              });
+            }},
+            {text: 'YES', onPress: () => {
+              Db.deleteUser(id);
+              this.getAllUsers(this.state.group_id);
+              this.setState({
+                name: "",
+                date_of_birth: "",
+                user_id: "",
+                avatarSource: {uri: 'https://picsum.photos/150'},
+                modalVisible: false
+              });
+          }},
+        ]
+      );
     }
     setModalVisible(visible,id) {
       this.setState({
@@ -132,7 +124,8 @@ class Home extends Component {
             });
           }
         });
-  }
+    }
+
     editUser(id){
       let date = formatedDate();  
       if(this.state.name === ""){
@@ -164,43 +157,12 @@ class Home extends Component {
         });
       });
     }
-    deleteUser(id) {
-      Alert.alert(
-        'Delete user',
-        'Delete user?',
-          [
-            {text: 'NO', onPress: () => {
-              this.setState({
-                modalOpened: false
-              });
-            }},
-            {text: 'YES', onPress: () => {
-              db.transaction(tx => {
-                tx.executeSql(`DELETE FROM Users WHERE id=${id}`, [], (tx, results) => {
-                  if(!results.rowsAffected>0){
-                    this.refs.toast.show('Something went wrong :(');
-                    return;
-                  }
-                  this.refs.toast.show('User succesfully deleted!');
-                  this.getAllUsers();
-                  this.setState({
-                    name: "",
-                    date_of_birth: "",
-                    user_id: "",
-                    avatarSource: {uri: 'https://picsum.photos/150'},
-                    modalVisible: false
-                  });
-              });
-            });
-          }},
-        ]
-      );
-    }
+
     groupSelect(group_id){
       this.setState({
         group_id: group_id
       });
-      this.getAllUsers();
+      this.getAllUsers(group_id);
     }
     setButtonColor(){
       return "red";
