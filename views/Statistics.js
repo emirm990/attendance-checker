@@ -81,7 +81,6 @@ class Statistics extends Component {
         }
         db.transaction(tx => {
           tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id} AND paid=${paid}`, [], (tx, results) => {
-            console.log(results);
             var temp = [];
             for (let i = 0; i < results.rows.length; ++i) {
               temp.push(results.rows.item(i));
@@ -94,7 +93,6 @@ class Statistics extends Component {
       }else{
         db.transaction(tx => {
           tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id}`, [], (tx, results) => {
-            console.log(results);
             var temp = [];
             for (let i = 0; i < results.rows.length; ++i) {
               temp.push(results.rows.item(i));

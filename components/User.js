@@ -27,7 +27,6 @@ class User extends Component {
           this.setState({
             statistics: temp
           });
-          console.log(temp);
         });
       });
     }
@@ -49,7 +48,7 @@ class User extends Component {
                 <FlatList
                   data={this.state.statistics}
                   renderItem={
-                  ({ item }) => <View style={{borderColor: "grey", borderWidth: 2, marginTop: 5}}><Text>Attended at: {item.attended_at}</Text><Text>Paid at: {item.paid_at}</Text></View>
+                  ({ item }) => <View style={{borderColor: "grey", borderWidth: 2, marginTop: 5}}>{item.attended_at ? <Text>Attended at: {item.attended_at}</Text>: null}{item.paid_at ? <Text>Paid at: {item.paid_at}</Text> : null}</View>
                   }
                 keyExtractor={item => item.id}
               />

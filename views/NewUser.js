@@ -32,14 +32,12 @@ class Statistics extends Component {
             },
           };
         ImagePicker.showImagePicker(options, (response) => {
-            console.log('Response = ', response);
-          
             if (response.didCancel) {
-              console.log('User cancelled image picker');
+              // console.log('User cancelled image picker');
             } else if (response.error) {
-              console.log('ImagePicker Error: ', response.error);
+              // console.log('ImagePicker Error: ', response.error);
             } else if (response.customButton) {
-              console.log('User tapped custom button: ', response.customButton);
+              // console.log('User tapped custom button: ', response.customButton);
             } else {
               const source = { uri: response.uri };
           
@@ -61,7 +59,6 @@ class Statistics extends Component {
       db.transaction(tx => {
         tx.executeSql(`INSERT INTO Users (image, name, date_of_birth,paid,attended,updated_at,group_id)
           VALUES ("${this.state.avatarSource.uri}","${this.state.name}"," ${this.state.dateOfBirth}", "0", "0", "${date}", ${this.state.group_id})`, [], (tx, results) => {
-                console.log(results)
                 if(!results.rowsAffected > 0){
                   this.refs.toast.show('Something went wrong :(');
                 }

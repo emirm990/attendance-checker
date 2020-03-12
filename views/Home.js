@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, Image, Switch,TouchableOpacity,Modal,TextInput,ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, Button, Image, Switch,TouchableOpacity,Modal,TextInput,ScrollView, Alert } from 'react-native';
 import Toast from 'react-native-easy-toast';
 import ImagePicker from 'react-native-image-picker';
 import Swiper from 'react-native-swiper';
@@ -50,10 +50,14 @@ class Home extends Component {
           }else{
             this.refs.toast.show('Something went wrong :(');
           }
-          tx.executeSql(`INSERT INTO Statistics (user_id, paid_at)
-          VALUES (${id}, "${date}")`, [], (tx, results) => {
+          if(value === true){
+            tx.executeSql(`INSERT INTO Statistics (user_id, paid_at)
+              VALUES (${id}, "${date}")`, [], (tx, results) => {
             this.getAllUsers();
           });
+          }else{
+            this.getAllUsers();
+          }
       });
     })}
     updateAttended(value,id){  
@@ -65,10 +69,14 @@ class Home extends Component {
           }else{
             this.refs.toast.show('Something went wrong :(');
           }
-          tx.executeSql(`INSERT INTO Statistics (user_id, attended_at)
-          VALUES (${id}, "${date}")`, [], (tx, results) => {
+          if(value===true){
+            tx.executeSql(`INSERT INTO Statistics (user_id, attended_at)
+            VALUES (${id}, "${date}")`, [], (tx, results) => {
+              this.getAllUsers();
+            });
+          }else{
             this.getAllUsers();
-          });
+          }
         });
       });
     }
@@ -82,7 +90,6 @@ class Home extends Component {
       db.transaction(tx => {
             tx.executeSql(`SELECT name,image,date_of_birth FROM Users WHERE id=${this.state.user_id}`, [], (tx, results) => {
               if(results){
-                
                 var temp = [];
                 for (let i = 0; i < results.rows.length; ++i) {
                   temp.push(results.rows.item(i));
@@ -111,8 +118,7 @@ class Home extends Component {
           },
         };
       ImagePicker.showImagePicker(options, (response) => {
-          console.log('Response = ', response);
-        
+
           if (response.didCancel) {
             console.log('User cancelled image picker');
           } else if (response.error) {
@@ -121,10 +127,6 @@ class Home extends Component {
             console.log('User tapped custom button: ', response.customButton);
           } else {
             const source = { uri: response.uri };
-        
-            // You can also display the image using data:
-            // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-        
             this.setState({
               avatarSource: source,
             });
