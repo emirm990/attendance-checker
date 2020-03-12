@@ -11,10 +11,10 @@ export function formatedDate(){
     if(date < 10){
       date = `0${date}`;
     }
-    if(hour < 9){
+    if(hour < 10){
       hour = `0${hour}`;
     }
-    if(minutes < 9){
+    if(minutes < 10){
       minutes = `0${minutes}`;
     }
     return `${date}.${month}.${year} ${hour}:${minutes}`;
