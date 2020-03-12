@@ -6,10 +6,13 @@ import Swiper from 'react-native-swiper';
 import { formatedDate } from '../helpers/formatedDate';
 import { requestCameraPermission, requestExternalPermission, requestExternalReadPermission } from '../helpers/permissions';
 import db from '../database/database';
+import Database from '../database/Database2';
+const Db = new Database();
 
 class Home extends Component {
     constructor(props) {
         super(props);
+        
         const { group_id } = this.props.route.params || 1;
         this.state = {
             users: [],
@@ -21,26 +24,37 @@ class Home extends Component {
             avatarSource : {uri: 'https://picsum.photos/150'}
           };
           this.groupSelect(group_id || this.state.group_id);
+          // this.getAllUsers = this.getAllUsers.bind(this)
           this.props.navigation.addListener('focus', () => {
             this.groupSelect(this.state.group_id);
           });
     }
     componentDidMount(){
       this.groupSelect(this.state.group_id);
+      
+      // this.getUsers_test();
     }
-    getAllUsers(){
-      db.transaction(tx => {
-        tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id}`, [], (tx, results) => {
-          var temp = [];
-          for (let i = 0; i < results.rows.length; ++i) {
-            temp.push(results.rows.item(i));
-          }
-          this.setState({
-            users: temp
-          });
+    getAllUsers(group_id){
+      console.log(group_id);
+      Db.getAllUsersFromDb(group_id).then(data=>{
+        this.setState({
+          users: data
         });
       });
     }
+    // getAllUsers(){
+    //   db.transaction(tx => {
+    //     tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id}`, [], (tx, results) => {
+    //       var temp = [];
+    //       for (let i = 0; i < results.rows.length; ++i) {
+    //         temp.push(results.rows.item(i));
+    //       }
+    //       this.setState({
+    //         users: temp
+    //       });
+    //     });
+    //   });
+    // }
     updatePaid(value,id){
       let date = formatedDate();   
       db.transaction(tx => {
@@ -53,10 +67,10 @@ class Home extends Component {
           if(value === true){
             tx.executeSql(`INSERT INTO Statistics (user_id, paid_at)
               VALUES (${id}, "${date}")`, [], (tx, results) => {
-            this.getAllUsers();
+            this.getAllUsers(this.state.group_id);
           });
           }else{
-            this.getAllUsers();
+            this.getAllUsers(this.state.group_id);
           }
       });
     })}
@@ -72,10 +86,10 @@ class Home extends Component {
           if(value===true){
             tx.executeSql(`INSERT INTO Statistics (user_id, attended_at)
             VALUES (${id}, "${date}")`, [], (tx, results) => {
-              this.getAllUsers();
+              this.getAllUsers(this.state.group_id);
             });
           }else{
-            this.getAllUsers();
+            this.getAllUsers(this.state.group_id);
           }
         });
       });
@@ -152,7 +166,7 @@ class Home extends Component {
               this.refs.toast.show('Something went wrong :(');
               return;
             }
-            this.getAllUsers();
+            this.getAllUsers(this.state.group_id);
             this.setState({
               name: "",
               date_of_birth: "",
@@ -182,7 +196,7 @@ class Home extends Component {
                     return;
                   }
                   this.refs.toast.show('User succesfully deleted!');
-                  this.getAllUsers();
+                  this.getAllUsers(this.state.group_id);
                   this.setState({
                     name: "",
                     date_of_birth: "",
@@ -200,7 +214,7 @@ class Home extends Component {
       this.setState({
         group_id: group_id
       });
-      this.getAllUsers();
+      this.getAllUsers(group_id);
     }
     setButtonColor(){
       return "red";
