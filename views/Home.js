@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Button, Image, Switch,TouchableOpacity,Modal,TextInput,ScrollView, Alert } from 'react-native';
+import { View, Text, Button, Image, Switch,TouchableOpacity,Modal,TextInput,ScrollView, Alert, ActivityIndicator } from 'react-native';
 import Toast from 'react-native-easy-toast';
 import ImagePicker from 'react-native-image-picker';
 import Swiper from 'react-native-swiper';
@@ -18,16 +18,15 @@ class Home extends Component {
             group_id: 1,
             name: "",
             date_of_birth: "",
-            avatarSource : {uri: 'https://picsum.photos/150'},
+            avatarSource : {uri: 'https://picsum.photos/150'}
           };
-          this.state.group_id = group_id;
           this.groupSelect(group_id || this.state.group_id);
           this.props.navigation.addListener('focus', () => {
             this.groupSelect(this.state.group_id);
           });
     }
     componentDidMount(){
-      this.groupSelect(this.group_id);
+      this.groupSelect(this.state.group_id);
     }
     getAllUsers(){
       db.transaction(tx => {
@@ -207,7 +206,7 @@ class Home extends Component {
     viewsList() {
       if(this.state.users.length === 0){
         return (
-          <View style={{flex: 1, justifyContent:"center",alignItems:"center"}}>
+          <View style={{flex: 1, justifyContent:"center",alignItems:"center", marginBottom: 40}}>
             <Text style={{fontSize: 25}}>No users available</Text>
           </View>
         )
@@ -215,7 +214,7 @@ class Home extends Component {
       return this.state.users.map((user) => {
         return (
           <TouchableOpacity activeOpacity={0.8} key={user.id} onLongPress={() => this.setModalVisible(!this.state.modalVisible, user.id)} style={{flex: 1, justifyContent:'center', alignItems:'center'}}>
-          <View >
+          <ScrollView >
               {user.image ? 
               <Image style={{width: 144, height: 256}}
               source={{uri: user.image}}/> : 
@@ -231,7 +230,7 @@ class Home extends Component {
                 <Text style={{width: 100, fontSize: 16}}>Platio: </Text>
                 <Switch onValueChange={()=>this.updatePaid(!user.paid, user.id)} value={Boolean(user.paid)}/>
               </View>
-          </View>
+          </ScrollView>
           </TouchableOpacity>
         )
       })
@@ -304,7 +303,7 @@ class Home extends Component {
                 <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
               </View>
             </View>
-            <Swiper showsButtons={true}>
+            <Swiper showsButtons={true} key={this.state.users.length} style={{marginTop: 25}}>
               {this.viewsList()}
             </Swiper>
             <Toast ref="toast"/>    

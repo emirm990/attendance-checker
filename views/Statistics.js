@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Button, FlatList } from 'react-native';
+import { View, Button, FlatList, Picker, Text } from 'react-native';
 import db from '../database/database';
 import User from '../components/User';
 
@@ -11,7 +11,8 @@ class Statistics extends Component {
           users: [],
           statistics: [],
           joined: [],
-          group_id: 1
+          group_id: 1,
+          passed_filter: 0
         }
         this.groupSelect(group_id || this.state.group_id);
         // this.getAllUsers();
@@ -69,6 +70,43 @@ class Statistics extends Component {
       });
       this.getAllUsers();
     }
+    filterUsers(itemValue){
+      if(itemValue === 1 || itemValue === 2){
+        let paid = 1;
+        if(itemValue === 1){
+          paid = 1;
+        }
+        if(itemValue === 2){
+          paid = 0;
+        }
+        db.transaction(tx => {
+          tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id} AND paid=${paid}`, [], (tx, results) => {
+            console.log(results);
+            var temp = [];
+            for (let i = 0; i < results.rows.length; ++i) {
+              temp.push(results.rows.item(i));
+            }
+            this.setState({
+              users: temp
+            });
+          });
+        });
+      }else{
+        db.transaction(tx => {
+          tx.executeSql(`SELECT * FROM Users WHERE group_id=${this.state.group_id}`, [], (tx, results) => {
+            console.log(results);
+            var temp = [];
+            for (let i = 0; i < results.rows.length; ++i) {
+              temp.push(results.rows.item(i));
+            }
+            this.setState({
+              users: temp
+            });
+          });
+        });
+      }
+      
+    }
     render() {
         return (
             <>
@@ -92,6 +130,22 @@ class Statistics extends Component {
               </View>
             </View>
             <View style={{marginBottom: 80}}>
+            <View style={{flexDirection: "row", alignItems: "center"}}>
+              <Text>Filted by paid: </Text>
+              <Picker
+                selectedValue={this.state.passed_filter}
+                style={{height: 50, width: 100}}
+                onValueChange={(itemValue, itemIndex) =>
+                  {this.setState({
+                    passed_filter: itemValue
+                  })
+                  this.filterUsers(itemValue)}
+                }>
+                <Picker.Item label="All Users" value={0}/>
+                <Picker.Item label="Yes" value={1} />
+                <Picker.Item label="No" value={2} />
+              </Picker>
+            </View>
               <FlatList
                 data={this.state.users}
                 renderItem={
