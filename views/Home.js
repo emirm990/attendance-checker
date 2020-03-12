@@ -31,7 +31,6 @@ class Home extends Component {
       this.groupSelect(this.state.group_id);
     }
     getAllUsers(group_id){
-      console.log(this.state);
       Db.getAllUsersFromDb(group_id).then(data=>{
         this.setState({
           users: data
@@ -81,9 +80,10 @@ class Home extends Component {
     }
     modalOpened(user_id){
       Db.modalOpened(user_id).then(data=>{
+        // console.log(data);
         this.setState({
           date_of_birth: data.date_of_birth,
-          image: data.image ? {uri: data.image} : {uri:'https://picsum.photos/150'},
+          avatarSource: data.image ? {uri: data.image} : {uri:'https://picsum.photos/150'},
           name: data.name,
         })
       });
@@ -91,25 +91,7 @@ class Home extends Component {
     modalClosed(group_id){
       this.getAllUsers(group_id);
     }
-    // modalOpened(){
-    //   db.transaction(tx => {
-    //         tx.executeSql(`SELECT name,image,date_of_birth FROM Users WHERE id=${this.state.user_id}`, [], (tx, results) => {
-    //           if(results){
-    //             var temp = [];
-    //             for (let i = 0; i < results.rows.length; ++i) {
-    //               temp.push(results.rows.item(i));
-    //             }
-    //             this.setState({
-    //               name: temp[0].name,
-    //               date_of_birth: temp[0].date_of_birth,
-    //               avatarSource: temp[0].image ? {uri: temp[0].image} : {uri:'https://picsum.photos/150'}
-    //             });
-    //           }else{
-    //             this.refs.toast.show('Something went wrong :(');
-    //           }
-    //         });
-    //   });
-    // }
+  
     async pickImage(){
       await requestCameraPermission();
       await requestExternalPermission();
@@ -158,7 +140,7 @@ class Home extends Component {
               this.refs.toast.show('Something went wrong :(');
               return;
             }
-            this.getAllUsers();
+            this.modalClosed(this.state.group_id);
             this.setState({
               name: "",
               date_of_birth: "",
@@ -222,7 +204,7 @@ class Home extends Component {
                 visible={this.state.modalVisible}
                 style={{justifyContent:"space-between"}}
                 onShow={()=>this.modalOpened(this.state.user_id)}
-                onRequestClose={() => {
+                onDismiss={() => {
                   this.modalClosed(this.state.group_id);
                 }}
                 >

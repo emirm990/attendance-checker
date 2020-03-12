@@ -30,7 +30,6 @@ class Database2 {
                 VALUES (${id}, "${date}")`,
 				[],
 				(tx, results) => {
-					console.log(results);
 				}
 			);
 		});
@@ -63,7 +62,6 @@ class Database2 {
                 VALUES (${id}, "${date}")`,
 				[],
 				(tx, results) => {
-					console.log(results);
 				}
 			);
 		});
@@ -101,7 +99,7 @@ class Database2 {
 			this.db.transaction((tx) => {
 				tx.executeSql(`SELECT name,image,date_of_birth FROM Users WHERE id=${id}`, [], (tx, results) => {
 					if (results) {
-						user = results.rows.item(0);
+                        user = results.rows.item(0);
 						resolve(user);
 						//   this.setState({
 						//     name: temp[0].name,
