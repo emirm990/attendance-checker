@@ -147,8 +147,7 @@ class Home extends Component {
               avatarSource: {uri: 'https://picsum.photos/150'},
               modalVisible: false,
               user_id: ""
-            });
-            
+            });   
         });
       });
     }
