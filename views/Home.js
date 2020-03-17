@@ -24,7 +24,7 @@ class Home extends Component {
           };
           this.groupSelect(group_id || this.state.group_id);
           this.props.navigation.addListener('focus', () => {
-            this.groupSelect(this.state.group_id);
+            this.groupSelect(this.props.route.params.group_id || group_id);
           });
     }
     componentDidMount(){

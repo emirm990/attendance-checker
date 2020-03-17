@@ -16,6 +16,10 @@ class Statistics extends Component {
             dateOfBirth: "",
             group_id: 1
         }
+        this.props.navigation.addListener('focus', () => {
+          
+          this.groupSelect(this.props.route.params.group_id || group_id);
+        });
         this.groupSelect(group_id || this.state.group_id);
     }
 
