@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { View, Button, FlatList, Picker, Text } from 'react-native';
 import db from '../database/database';
 import User from '../components/User';
+import NavButtons from '../components/NavButtons';
+import GroupSelector from '../components/GroupSelector';
 
 class Statistics extends Component {
     constructor(props) {
@@ -15,14 +17,14 @@ class Statistics extends Component {
           passed_filter: 0
         }
         this.groupSelect(group_id || this.state.group_id);
-        // this.getAllUsers();
         this.getStatistics();
-        // this.joinTables();
         this.props.navigation.addListener('focus', () => {
           
-          this.groupSelect(this.props.route.params.group_id || group_id);
+          let routeParameters = this.props.route.params;
+            if(routeParameters){
+              this.groupSelect(this.props.route.params.group_id || group_id);
+            }
           this.getStatistics();
-          // this.joinTables();
         });
         
     }
@@ -65,7 +67,7 @@ class Statistics extends Component {
         });
       });
     }
-    groupSelect(group_id){
+    groupSelect=(group_id)=>{
       this.setState({
         group_id: group_id
       });
@@ -109,25 +111,14 @@ class Statistics extends Component {
     render() {
         return (
             <>
-            <View style={{flexDirection:"row"}}>
-              <View style={{flex:1, marginRight:2}}>
-                <Button style={{flex:1}} title="Home" onPress={() => this.props.navigation.navigate('Home', {group_id:this.state.group_id})} />
-              </View>
-              <View style={{flex:1, marginLeft:2}}>
-                <Button style={{flex:1}}title="New User" onPress={()=> this.props.navigation.navigate('NewUser', {group_id: this.state.group_id})} />
-              </View>
-            </View>
-            <View style={{flexDirection:"row", marginTop: 5}}>
-              <View style={{flex: 1}}>
-                <Button title="Group 1" color={this.state.group_id === 1 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(1)}/>
-              </View>
-              <View style={{flex: 1,marginLeft:2, marginRight:2}}>
-                <Button title="Group 2" color={this.state.group_id === 2 || this.group_id === 2 ? "red" : "lightblue"} onPress={()=>this.groupSelect(2)}/>
-              </View>
-              <View style={{flex: 1}}>
-                <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 3 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
-              </View>
-            </View>
+            <NavButtons title1='Home' title2='New User' link1={() => this.props.navigation.navigate('Home', {group_id: this.state.group_id})} link2={()=>this.props.navigation.navigate('NewUser', {group_id: this.state.group_id})} />
+            <GroupSelector 
+              groupTitle1="Group 1" 
+              groupTitle2="Group 2" 
+              groupTitle3="Group 3" 
+              active={this.state.group_id} 
+              selectGroup={this.groupSelect}
+              />
             <View style={{marginBottom: 80}}>
             <View style={{flexDirection: "row", alignItems: "center"}}>
               <Text>Filted by paid: </Text>
@@ -157,7 +148,5 @@ class Statistics extends Component {
         );
     }
 }
-
-Statistics.propTypes = {};
 
 export default Statistics;

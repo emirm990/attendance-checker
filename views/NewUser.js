@@ -5,6 +5,8 @@ import Toast from 'react-native-easy-toast';
 import db from '../database/database';
 import { requestCameraPermission, requestExternalPermission, requestExternalReadPermission } from '../helpers/permissions';
 import { formatedDate } from '../helpers/formatedDate';
+import NavButtons from '../components/NavButtons';
+import GroupSelector from '../components/GroupSelector';
 
 class Statistics extends Component {
     constructor(props) {
@@ -18,7 +20,11 @@ class Statistics extends Component {
         }
         this.props.navigation.addListener('focus', () => {
           
-          this.groupSelect(this.props.route.params.group_id || group_id);
+          let routeParameters = this.props.route.params;
+            if(routeParameters){
+              this.groupSelect(this.props.route.params.group_id || group_id);
+            }
+
         });
         this.groupSelect(group_id || this.state.group_id);
     }
@@ -37,11 +43,11 @@ class Statistics extends Component {
           };
         ImagePicker.showImagePicker(options, (response) => {
             if (response.didCancel) {
-              // console.log('User cancelled image picker');
+              console.log('User cancelled image picker');
             } else if (response.error) {
-              // console.log('ImagePicker Error: ', response.error);
+              console.log('ImagePicker Error: ', response.error);
             } else if (response.customButton) {
-              // console.log('User tapped custom button: ', response.customButton);
+              console.log('User tapped custom button: ', response.customButton);
             } else {
               const source = { uri: response.uri };
           
@@ -75,7 +81,7 @@ class Statistics extends Component {
             });
         });
     }
-    groupSelect(group_id){
+    groupSelect=(group_id)=>{
       this.setState({
         group_id: group_id
       });
@@ -83,26 +89,14 @@ class Statistics extends Component {
     render() {
         return (
             <>
-            
-            <View style={{flexDirection:"row", marginBottom: 5}}>
-              <View style={{flex:1, marginRight:2}}>
-                <Button style={{flex:1}}title="Home" onPress={() => this.props.navigation.navigate('Home', {group_id: this.state.group_id})} />
-              </View>
-              <View style={{flex:1, marginLeft:2}}>
-                <Button style={{flex:1}}title="Statistics" onPress={()=>this.props.navigation.navigate('Statistics', {group_id: this.state.group_id})} />
-              </View>
-            </View>
-            <View style={{flexDirection:"row", marginBottom: 10}}>
-              <View style={{flex: 1}}>
-                <Button title="Group 1" color={this.state.group_id === 1 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(1)}/>
-              </View>
-              <View style={{flex: 1,marginLeft:2, marginRight:2}}>
-                <Button title="Group 2" color={this.state.group_id === 2 || this.group_id === 2 ? "red" : "lightblue"} onPress={()=>this.groupSelect(2)}/>
-              </View>
-              <View style={{flex: 1}}>
-                <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 3 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
-              </View>
-            </View>
+            <NavButtons title1='Home' title2='Statistics' link1={() => this.props.navigation.navigate('Home', {group_id: this.state.group_id})} link2={()=>this.props.navigation.navigate('Statistics', {group_id: this.state.group_id})} />
+            <GroupSelector 
+              groupTitle1="Group 1" 
+              groupTitle2="Group 2" 
+              groupTitle3="Group 3" 
+              active={this.state.group_id} 
+              selectGroup={this.groupSelect}
+              />
             <ScrollView>
                 <View style={{flexDirection:'column', alignItems: 'center',marginLeft: 10, marginRight: 10, marginBottom: 5}}>
                     <Image source={this.state.avatarSource} style={{width: 144, height: 256}}/>
@@ -124,7 +118,5 @@ class Statistics extends Component {
         );
     }
 }
-
-Statistics.propTypes = {};
 
 export default Statistics;

@@ -62,5 +62,4 @@ class User extends Component {
     }
 }
 
-User.propTypes = {};
 export default User;

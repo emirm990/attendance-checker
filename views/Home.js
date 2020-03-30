@@ -7,7 +7,8 @@ import { formatedDate } from '../helpers/formatedDate';
 import { requestCameraPermission, requestExternalPermission, requestExternalReadPermission } from '../helpers/permissions';
 import db from '../database/database';
 import Database from '../database/Database2';
-
+import NavButtons from '../components/NavButtons';
+import GroupSelector from '../components/GroupSelector';
 const Db = new Database();
 class Home extends Component {
     constructor(props) {
@@ -24,7 +25,12 @@ class Home extends Component {
           };
           this.groupSelect(group_id || this.state.group_id);
           this.props.navigation.addListener('focus', () => {
-            this.groupSelect(this.props.route.params.group_id || group_id);
+
+            let routeParameters = this.props.route.params;
+            if(routeParameters){
+              this.groupSelect(this.props.route.params.group_id || group_id);
+            }
+
           });
     }
     componentDidMount(){
@@ -80,7 +86,6 @@ class Home extends Component {
     }
     modalOpened(user_id){
       Db.modalOpened(user_id).then(data=>{
-        // console.log(data);
         this.setState({
           date_of_birth: data.date_of_birth,
           avatarSource: data.image ? {uri: data.image} : {uri:'https://picsum.photos/150'},
@@ -152,7 +157,8 @@ class Home extends Component {
       });
     }
 
-    groupSelect(group_id){
+    groupSelect = (group_id) => {
+
       this.setState({
         group_id: group_id
       });
@@ -245,25 +251,20 @@ class Home extends Component {
                 </ScrollView>
                 <Toast ref="toastModal"/>   
               </Modal>
-            <View style={{flexDirection:"row"}}>
-              <View style={{flex:1, marginRight:2}}>
-                <Button style={{flex:1}}title="Statistics" onPress={() => this.props.navigation.navigate('Statistics', {group_id: this.state.group_id})} />
-              </View>
-              <View style={{flex:1, marginLeft:2}}>
-                <Button style={{flex:1}}title="New User" onPress={()=>this.props.navigation.navigate('NewUser', {group_id: this.state.group_id})} />
-              </View>
-            </View>
-            <View style={{flexDirection:"row", marginTop: 5}}>
-              <View style={{flex: 1}} >
-                <Button title="Group 1" color={this.state.group_id === 1 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(1)}/>
-              </View>
-              <View style={{flex: 1,marginLeft:2, marginRight:2}}>
-                <Button title="Group 2" color={this.state.group_id === 2 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(2)}/>
-              </View>
-              <View style={{flex: 1}}>
-                <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
-              </View>
-            </View>
+
+            <NavButtons 
+              title1='Statistics' 
+              title2='New User' 
+              link1={() => this.props.navigation.navigate('Statistics', {group_id: this.state.group_id})} 
+              link2={()=>this.props.navigation.navigate('NewUser', {group_id: this.state.group_id})} 
+            />
+            <GroupSelector 
+              groupTitle1="Group 1" 
+              groupTitle2="Group 2" 
+              groupTitle3="Group 3" 
+              active={this.state.group_id} 
+              selectGroup={this.groupSelect}
+              />
             <Swiper showsButtons={true} key={this.state.users.length} style={{marginTop: 25}}>
               {this.viewsList()}
             </Swiper>
@@ -272,7 +273,5 @@ class Home extends Component {
         );
     }
 }
-
-Home.propTypes = {};
 
 export default Home;
