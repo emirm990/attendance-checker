@@ -16,19 +16,21 @@ class Statistics extends Component {
             avatarSource : {uri: 'https://picsum.photos/150'},
             name: "",
             dateOfBirth: "",
+            phoneNumber: "",
             group_id: 1
         }
-        this.props.navigation.addListener('focus', () => {
-          
-          let routeParameters = this.props.route.params;
-            if(routeParameters){
-              this.groupSelect(this.props.route.params.group_id || group_id);
-            }
-
-        });
-        this.groupSelect(group_id || this.state.group_id);
     }
+    componentDidMount(){
+      this.props.navigation.addListener('focus', () => {
+          
+        let routeParameters = this.props.route.params;
+          if(routeParameters){
+            this.groupSelect(this.props.route.params.group_id || this.group_id);
+          }
 
+      });
+      this.groupSelect(this.group_id || this.state.group_id);
+    }
     async pickImage(){
         await requestCameraPermission();
         await requestExternalPermission();
@@ -67,8 +69,8 @@ class Statistics extends Component {
         return;
       }
       db.transaction(tx => {
-        tx.executeSql(`INSERT INTO Users (image, name, date_of_birth,paid,attended,updated_at,group_id)
-          VALUES ("${this.state.avatarSource.uri}","${this.state.name}"," ${this.state.dateOfBirth}", "0", "0", "${date}", ${this.state.group_id})`, [], (tx, results) => {
+        tx.executeSql(`INSERT INTO Users (image, name, date_of_birth,paid,attended,updated_at,group_id,phone_number)
+          VALUES ("${this.state.avatarSource.uri}","${this.state.name}"," ${this.state.dateOfBirth}", "0", "0", "${date}", ${this.state.group_id}, "${this.state.phoneNumber}")`, [], (tx, results) => {
                 if(!results.rowsAffected > 0){
                   this.refs.toast.show('Something went wrong :(');
                 }
@@ -76,6 +78,7 @@ class Statistics extends Component {
                 this.setState({
                   name: "",
                   dateOfBirth: "",
+                  phoneNumber: "",
                   avatarSource: {uri: 'https://picsum.photos/150'}
                 })
             });
@@ -109,6 +112,10 @@ class Statistics extends Component {
                 <View style={{flexDirection:'row', alignItems: 'center',marginLeft: 10, marginRight: 10, marginBottom: 10}}>
                     <Text style={{flex:1}}>Date of Birth: </Text><TextInput keyboardType={"number-pad"} style={{flex: 3,marginLeft: 5, height:50, borderColor: 'gray', borderWidth: 1 }} onChangeText={(dateOfBirth) => this.setState({dateOfBirth: dateOfBirth})}
           value={this.state.dateOfBirth}/>
+                </View>
+                <View style={{flexDirection:'row', alignItems: 'center',marginLeft: 10, marginRight: 10, marginBottom: 10}}>
+                    <Text style={{flex:1}}>Phone: </Text><TextInput keyboardType={"number-pad"} style={{flex: 3,marginLeft: 5, height:50, borderColor: 'gray', borderWidth: 1 }} onChangeText={(phoneNumber) => this.setState({phoneNumber: phoneNumber})}
+          value={this.state.phoneNumber}/>
                 </View>
                 <Button title="Save" onPress={()=>this.saveUser()}/>
                 

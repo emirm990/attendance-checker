@@ -97,7 +97,7 @@ class Database2 {
 		let user = [];
 		return new Promise((resolve) => {
 			this.db.transaction((tx) => {
-				tx.executeSql(`SELECT name,image,date_of_birth FROM Users WHERE id=${id}`, [], (tx, results) => {
+				tx.executeSql(`SELECT name,image,date_of_birth,phone_number FROM Users WHERE id=${id}`, [], (tx, results) => {
 					if (results) {
                         user = results.rows.item(0);
 						resolve(user);

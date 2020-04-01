@@ -21,20 +21,21 @@ class Home extends Component {
             group_id: 1,
             name: "",
             date_of_birth: "",
+            phone_number: "",
             avatarSource : {uri: 'https://picsum.photos/150'}
           };
-          this.groupSelect(group_id || this.state.group_id);
-          this.props.navigation.addListener('focus', () => {
 
-            let routeParameters = this.props.route.params;
-            if(routeParameters){
-              this.groupSelect(this.props.route.params.group_id || group_id);
-            }
-
-          });
     }
     componentDidMount(){
-      this.groupSelect(this.state.group_id);
+      this.groupSelect(this.group_id || this.state.group_id);
+      this.props.navigation.addListener('focus', () => {
+
+        let routeParameters = this.props.route.params;
+        if(routeParameters){
+          this.groupSelect(this.props.route.params.group_id || this.group_id);
+        }
+
+      });
     }
     getAllUsers(group_id){
       Db.getAllUsersFromDb(group_id).then(data=>{
@@ -88,6 +89,7 @@ class Home extends Component {
       Db.modalOpened(user_id).then(data=>{
         this.setState({
           date_of_birth: data.date_of_birth,
+          phone_number: data.phone_number,
           avatarSource: data.image ? {uri: data.image} : {uri:'https://picsum.photos/150'},
           name: data.name,
         })
@@ -137,6 +139,7 @@ class Home extends Component {
           SET image="${this.state.avatarSource.uri}",
               name="${this.state.name}", 
               date_of_birth="${this.state.date_of_birth}",
+              phone_number="${this.state.phone_number}",
               updated_at="${date}",
               group_id=${this.state.group_id}
           WHERE id=${id}`,
@@ -149,6 +152,7 @@ class Home extends Component {
             this.setState({
               name: "",
               date_of_birth: "",
+              phone_number: "",
               avatarSource: {uri: 'https://picsum.photos/150'},
               modalVisible: false,
               user_id: ""
@@ -185,7 +189,10 @@ class Home extends Component {
               <Image style={{width: 144, height: 256}}
               source={{uri: 'https://picsum.photos/150'}}/>}
               <Text style={{fontSize: 25, marginBottom: 5, marginTop: 5}}>{user.name}</Text>
-              <Text style={{fontSize: 18, marginBottom: 5}}>{user.date_of_birth}</Text>
+              {console.log(this.state)}
+              {user.date_of_birth != " " ? <Text style={{marginBottom: 5}}>{user.date_of_birth}</Text> : null}
+              {user.phone_number != " " ? <Text style={{marginBottom: 5}}>{user.phone_number}</Text> : null}
+
               <View style={{flexDirection:'row'}}>
                 <Text style={{width:100, fontSize: 16}}>Prisutan: </Text>
                 <Switch onValueChange={()=>this.updateAttended(!user.attended, user.id)} value={Boolean(user.attended)}/>
@@ -213,7 +220,7 @@ class Home extends Component {
                   this.modalClosed(this.state.group_id);
                 }}
                 >
-                <View style={{flexDirection:"row", flex: 1}}>
+                <View style={{flexDirection:"row"}}>
                   <View style={{flex:1, marginRight:2}}>
                     <Button style={{flexBasis: 1}} onPress={() => {
                       this.setModalVisible(!this.state.modalVisible);
@@ -234,7 +241,7 @@ class Home extends Component {
                   active={this.state.group_id} 
                   selectGroup={this.groupSelect}
                 />
-                <ScrollView style={{marginTop: 10}}>
+                <ScrollView style={{marginTop: 10, flex: 1}}>
                     <View style={{flexDirection:'column', alignItems: 'center',marginLeft: 10, marginRight: 10, marginBottom: 5}}>
                       <Image source={this.state.avatarSource} style={{width: 144, height: 256}}/>
                       <Button title="Image" onPress={()=>this.pickImage()}/>
@@ -243,6 +250,8 @@ class Home extends Component {
                         value={this.state.name}/>
                     <TextInput style={{borderColor: 'gray', borderWidth: 1,alignSelf:"center", width: 220,marginTop:5,marginBottom:5 }} onChangeText={(date_of_birth) => this.setState({date_of_birth: date_of_birth})}
                         value={this.state.date_of_birth}/>
+                    <TextInput style={{borderColor: 'gray', borderWidth: 1,alignSelf:"center", width: 220,marginTop:5,marginBottom:5 }} onChangeText={(phone_number) => this.setState({phone_number: phone_number})}
+                        value={this.state.phone_number}/>
                     <Button title="Save" onPress={()=>this.editUser(this.state.user_id)}/>
                 </ScrollView>
                 <Toast ref="toastModal"/>   

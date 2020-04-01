@@ -16,7 +16,20 @@ class Statistics extends Component {
           group_id: 1,
           passed_filter: 0
         }
-        this.groupSelect(group_id || this.state.group_id);
+        // this.groupSelect(group_id || this.state.group_id);
+        // this.getStatistics();
+        // this.props.navigation.addListener('focus', () => {
+          
+        //   let routeParameters = this.props.route.params;
+        //     if(routeParameters){
+        //       this.groupSelect(this.props.route.params.group_id || group_id);
+        //     }
+        //   this.getStatistics();
+        // });
+        
+    }
+    componentDidMount(){
+      this.groupSelect(this.group_id || this.state.group_id);
         this.getStatistics();
         this.props.navigation.addListener('focus', () => {
           
@@ -26,7 +39,6 @@ class Statistics extends Component {
             }
           this.getStatistics();
         });
-        
     }
     getStatistics(){
       db.transaction(tx => {
