@@ -227,17 +227,13 @@ class Home extends Component {
                     </TouchableOpacity>
                   </View>
                 </View>
-                <View style={{flexDirection:"row", marginBottom: 10}}>
-                  <View style={{flex: 1}}>
-                    <Button title="Group 1" color={this.state.group_id === 1 || this.group_id === 1 ? "red" : "lightblue"} onPress={()=>this.groupSelect(1)}/>
-                  </View>
-                  <View style={{flex: 1,marginLeft:2, marginRight:2}}>
-                    <Button title="Group 2" color={this.state.group_id === 2 || this.group_id === 2 ? "red" : "lightblue"} onPress={()=>this.groupSelect(2)}/>
-                  </View>
-                  <View style={{flex: 1}}>
-                   <Button title="Group 3" color={this.state.group_id === 3 || this.group_id === 3 ? "red" : "lightblue"} onPress={()=>this.groupSelect(3)}/>
-                  </View>
-                </View>
+                <GroupSelector 
+                  groupTitle1="Group 1" 
+                  groupTitle2="Group 2" 
+                  groupTitle3="Group 3" 
+                  active={this.state.group_id} 
+                  selectGroup={this.groupSelect}
+                />
                 <ScrollView style={{marginTop: 10}}>
                     <View style={{flexDirection:'column', alignItems: 'center',marginLeft: 10, marginRight: 10, marginBottom: 5}}>
                       <Image source={this.state.avatarSource} style={{width: 144, height: 256}}/>
